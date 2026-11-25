@@ -46,12 +46,14 @@ def main():
             bad.append((c["id"], ", ".join(issues)))
         if fix:
             open(jsp, "w", encoding="utf-8").write(js)
+            changed = c.get("sha256") != h or c.get("bytes") != size
             c["bytes"] = size
             c["sha256"] = h
-            c["updated_at"] = now
+            if changed or not c.get("updated_at"):
+                c["updated_at"] = now
             fixed.append(c["id"])
     if fix:
-        man["updated_at"] = now
+        man["updated_at"] = max([c.get("updated_at") or "" for c in man.get("chunks", [])] or [now])
         man["checked_at"] = now
         json.dump(man, open(MAN, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
         js = "window.KOVO_RECEIVE&&window.KOVO_RECEIVE(%s);" % json.dumps(man, ensure_ascii=False, separators=(",", ":"))
