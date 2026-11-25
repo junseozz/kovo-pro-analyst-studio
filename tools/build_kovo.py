@@ -39,6 +39,24 @@ def n(v):
     except Exception:
         return v
 
+
+def dedupe(rows):
+    """같은 pcode가 여러 행으로 내려오는 경우(공식 API 중복 행) 세트 수가 큰 행만 남긴다."""
+    def key(r):
+        return r[0] if isinstance(r, (list, tuple)) else r.get("pcode")
+    def by(r):
+        if isinstance(r, (list, tuple)):
+            return r[6] or 0
+        return r.get("s_count") or 0
+    best, order = {}, []
+    for r in rows:
+        k = key(r)
+        if k not in best:
+            best[k] = r; order.append(k)
+        elif by(r) > by(best[k]):
+            best[k] = r
+    return [best[k] for k in order]
+
 GEN = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
 
 def build():
@@ -111,7 +129,7 @@ def build():
                             n(r.get("csat")), n(r.get("csas")), n(r.get("csaf")), n(r.get("csae")),
                             n(r.get("bsp")), n(r.get("ssp")), n(r.get("dsp")), n(r.get("setsp")), n(r.get("rsp")),
                             n(r.get("sasp")), n(r.get("warning"))]
-                           for r in d["playerRecords"]]
+                           for r in dedupe(d["playerRecords"])]
             rk[sc][key] = {}
             for rp, rows in d["ranks"].items():
                 if not rows:
@@ -169,7 +187,7 @@ def build():
                              n(r.get("st")), n(r.get("ss")), n(r.get("sf")), n(r.get("bt")), n(r.get("bs")),
                              n(r.get("dt")), n(r.get("ds")), n(r.get("df")), n(r.get("sett")), n(r.get("sets")),
                              n(r.get("setf")), n(r.get("rt")), n(r.get("rs")), n(r.get("rf")), n(r.get("err"))]
-                            for r in pr200],
+                            for r in dedupe(pr200)],
             }
     fbox = {}
     for k, b in (raw.get("futuresGames") or {}).items():
@@ -203,7 +221,7 @@ def build():
                                          n(r.get("st")), n(r.get("ss")), n(r.get("sf")), n(r.get("bt")), n(r.get("bs")),
                                          n(r.get("dt")), n(r.get("ds")), n(r.get("df")), n(r.get("sett")), n(r.get("sets")),
                                          n(r.get("setf")), n(r.get("rt")), n(r.get("rs")), n(r.get("rf")), n(r.get("err"))]
-                                        for r in prr]}
+                                        for r in dedupe(prr)]}
 
     # 선수
     players = []
