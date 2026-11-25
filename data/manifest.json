@@ -1,8 +1,8 @@
 {
  "schema_version": 3,
  "app_version": "2.3.0",
- "updated_at": "2026-11-26T07:31:50+09:00",
- "checked_at": "2026-11-26T07:31:50+09:00",
+ "updated_at": "2026-11-26T08:08:28+09:00",
+ "checked_at": "2026-11-26T08:08:38+09:00",
  "data_through": "2026-11-24",
  "latest_season": "023",
  "recent3": [
@@ -16,9 +16,9 @@
    "id": "core",
    "path": "data/core.json",
    "js": "data/core.js",
-   "sha256": "87663e5e89dcd28d7c765253495a6cd92059ea2bf56fb932217e476ed18af67f",
-   "bytes": 2346034,
-   "updated_at": "2026-11-26T07:00:46+09:00",
+   "sha256": "6dfb17a6207e0e17c7f3d39e27805c469a36256aaa99f5b4e9a95c556ff8528c",
+   "bytes": 2350720,
+   "updated_at": "2026-11-26T08:08:28+09:00",
    "globals": [
     "KOVO_DATA"
    ]
