@@ -200,7 +200,9 @@ def build():
         s = sl_v.get(sc) or {}
         std = (((raw["v"][sc].get("1") or {}).get("standings")) or [])
         seasons.append({"c": sc, "n": s.get("seasonName") or (std[0]["seasonName"] if std else sc),
-                        "y": s.get("ryear") or "", "cur": 1 if sc == "023" else 0})
+                        "y": s.get("ryear") or "", "cur": 0})
+    if seasons:
+        seasons[0]["cur"] = 1  # 최신 시즌(새 시즌이 들어오면 자동으로 이동)
     recent3 = [s["c"] for s in seasons[:3]]
     cupSeasons, futSeasons = [], []
     cm = raw.get("cup_meta_all") or {}
