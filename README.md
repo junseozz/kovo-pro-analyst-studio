@@ -62,7 +62,13 @@ python3 tools/update_news.py          # 뉴스만 자주 갱신할 때
 python3 tools/verify_manifest.py --fix
 ```
 
-## 5. 신분·이력 기준
+## 5. 실시간 갱신
+
+앱은 열릴 때와 2분마다 KOVO 공식 API(`user-api.kovo.co.kr`, CORS `Origin: null` 허용)를 직접 호출해
+최신 시즌의 경기 일정·세트 스코어·팀 순위를 제자리에서 갱신합니다(상태 표시: `실시간 HH:MM`).
+GitHub 청크 동기화는 10분마다 별도로 수행하며, 바뀐 청크만 내려받습니다.
+
+## 6. 신분·이력 기준
 
 선수 신분은 KOVO 공식 `/players/{pcode}/history`(등록·계약·FA·이적·임대·자유신분·임의해지·은퇴)와
 최신 시즌 등록 로스터(`/teams/{code}/players?seasonCode=023`, `status=REGISTER`)로만 판정합니다.
