@@ -1,18 +1,24 @@
 {
- "schema_version": 2,
- "app_version": "v1.0.0",
- "updated_at": "2026-11-25T16:37:09+09:00",
- "checked_at": "2026-11-25T16:37:09+09:00",
+ "schema_version": 3,
+ "app_version": "2.0.0",
+ "updated_at": "2026-11-25T19:39:09+09:00",
+ "checked_at": "2026-11-25T19:39:09+09:00",
  "data_through": "2026-11-24",
- "note": "KOVO 분석 스튜디오 앱이 맨 먼저 이 파일을 읽고 sha256 이 바뀐 청크만 내려받습니다. <id>.json(정본)과 window.KOVO_RECEIVE(...) 로 감싼 <id>.js 가 같은 내용입니다.",
+ "latest_season": "023",
+ "recent3": [
+  "023",
+  "022",
+  "021"
+ ],
+ "note": "앱이 맨 먼저 이 파일을 읽고 sha256 이 바뀐 청크만 내려받습니다. box_* 청크는 경기 박스스코어를 열 때만 내려받습니다.",
  "chunks": [
   {
    "id": "core",
    "path": "data/core.json",
    "js": "data/core.js",
-   "sha256": "93f9af804e5b90852b900ebd92245f0d58571201d9772b8df29b14168408cb6b",
-   "bytes": 860074,
-   "updated_at": "2026-11-25T16:37:09+09:00",
+   "sha256": "be8de2259562c6c2b0b7c9dd7f609364d047cbe386a946861ac5729135808bf3",
+   "bytes": 2521740,
+   "updated_at": "2026-11-25T19:38:51+09:00",
    "globals": [
     "KOVO_DATA"
    ]
@@ -21,9 +27,9 @@
    "id": "games",
    "path": "data/games.json",
    "js": "data/games.js",
-   "sha256": "60fa82bf92fe1b63c2f9aa528daddb628cc17e7c944a583d97fcd744d752da2d",
-   "bytes": 2105813,
-   "updated_at": "2026-11-25T16:37:09+09:00",
+   "sha256": "784297d85f9f4feb732ada7e28d1cd2ba7897df4ed9cdef71e823686d3ac9c4e",
+   "bytes": 4188703,
+   "updated_at": "2026-11-25T19:38:51+09:00",
    "globals": [
     "KOVO_DATA"
    ]
@@ -32,9 +38,9 @@
    "id": "season",
    "path": "data/season.json",
    "js": "data/season.js",
-   "sha256": "e156b43529cfeb239f5e42304b96be5ecbc1d47cc36f8764241c58c46eacf368",
-   "bytes": 774902,
-   "updated_at": "2026-11-25T16:37:09+09:00",
+   "sha256": "54c169ed36f0dc95a0b21381639096f7e1c047b358f58b5f95b66db0537e5f2c",
+   "bytes": 2450424,
+   "updated_at": "2026-11-25T19:38:51+09:00",
    "globals": [
     "KOVO_DATA"
    ]
@@ -43,9 +49,9 @@
    "id": "news",
    "path": "data/news.json",
    "js": "data/news.js",
-   "sha256": "877ede99cb1db0bcbee9fa7ebd682c584b987f5d28f5c7d1df774654d3c72d29",
-   "bytes": 223346,
-   "updated_at": "2026-11-25T16:37:09+09:00",
+   "sha256": "cc7cb2bcf3ca1c2f0cc885168cf6d4ed698a195d22e81f425dcd7fdf28219f1f",
+   "bytes": 587452,
+   "updated_at": "2026-11-25T19:39:09+09:00",
    "globals": [
     "KOVO_DATA"
    ]
@@ -54,11 +60,575 @@
    "id": "live_patch",
    "path": "data/live_patch.json",
    "js": "data/live_patch.js",
-   "sha256": "61d348910e22afbd320341e8155a40373cdcb1b9c81fb63de542417409ff6f9a",
-   "bytes": 3718,
-   "updated_at": "2026-11-25T16:37:09+09:00",
+   "sha256": "2febca35dcac7a945c082342efc73d0b7180f025c3c491f39208a031db44295b",
+   "bytes": 226478,
+   "updated_at": "2026-11-25T19:38:51+09:00",
    "globals": [
     "KOVO_DATA"
+   ]
+  },
+  {
+   "id": "box_001",
+   "path": "data/box_001.json",
+   "js": "data/box_001.js",
+   "sha256": "6a31ec6a10d9afaac78c13f80e40bef2cb8fef22437ca41b59296acce5d32c00",
+   "bytes": 365567,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_002",
+   "path": "data/box_002.json",
+   "js": "data/box_002.js",
+   "sha256": "f5ce09109de2e89b7da0af6c187af05ce65b10933ea5b7e391f651a6ef4d392b",
+   "bytes": 625993,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_003",
+   "path": "data/box_003.json",
+   "js": "data/box_003.js",
+   "sha256": "5cc63041cdea86f846cbd841491e24d6d3e9d84357c96aeff817a7743ca5403d",
+   "bytes": 513599,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_004",
+   "path": "data/box_004.json",
+   "js": "data/box_004.js",
+   "sha256": "57c53df055add9cdacc0e44818c074a3826d6b64c8e2f922dd389ea87817e986",
+   "bytes": 611828,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_005",
+   "path": "data/box_005.json",
+   "js": "data/box_005.js",
+   "sha256": "5d54dfaf9ba23a9b96d2e35756e135d16b79badde964eedc5d8f1de23061a81b",
+   "bytes": 603905,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_006",
+   "path": "data/box_006.json",
+   "js": "data/box_006.js",
+   "sha256": "be35e2c076b0e52d26b8bc00c0865159de3df4554c6fb4b275933141eb2ffe3a",
+   "bytes": 721888,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_007",
+   "path": "data/box_007.json",
+   "js": "data/box_007.js",
+   "sha256": "ef53a0ffc9e1f46fa6a72bed25960ce9f70840e096c4cc121651d36bcd71aad7",
+   "bytes": 627800,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_008",
+   "path": "data/box_008.json",
+   "js": "data/box_008.js",
+   "sha256": "da9cc6ff5f0bd62d5c5dad2626d29e1e66028ff881e31d12d93f9de2179b369e",
+   "bytes": 755399,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_009",
+   "path": "data/box_009.json",
+   "js": "data/box_009.js",
+   "sha256": "c3d0c56b8a35d813eaab485d7da8fa0c2680dd937717e053daecbbc2a7f77520",
+   "bytes": 636409,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_010",
+   "path": "data/box_010.json",
+   "js": "data/box_010.js",
+   "sha256": "0d30b7f93a8c225b7662595455c121906c067b184acb8b916889946617e52d8b",
+   "bytes": 701569,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_011",
+   "path": "data/box_011.json",
+   "js": "data/box_011.js",
+   "sha256": "be3670c75e9428b9309e748c0fdbac6ef1334864e970045976d2ee5df18b3d79",
+   "bytes": 779463,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_012",
+   "path": "data/box_012.json",
+   "js": "data/box_012.js",
+   "sha256": "daaae72e98f80e9009db0698868b9cd2b9884a6ba951c7d805cf6e072899b544",
+   "bytes": 808021,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_013",
+   "path": "data/box_013.json",
+   "js": "data/box_013.js",
+   "sha256": "d292c2c0d7f6305082e6b155100354b478a038b6e81dbada9a07b68dd97c6387",
+   "bytes": 800762,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_014",
+   "path": "data/box_014.json",
+   "js": "data/box_014.js",
+   "sha256": "742b9dc1e2086d6b9b27708783142c9d0547873a9b5384f395ab7e95112fcad7",
+   "bytes": 802955,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_015",
+   "path": "data/box_015.json",
+   "js": "data/box_015.js",
+   "sha256": "0608e7034324029aa51170a81192e7bccc4838a02a5c0354d3047ad98211042e",
+   "bytes": 798134,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_016",
+   "path": "data/box_016.json",
+   "js": "data/box_016.js",
+   "sha256": "f41efbab49ca10899789bbc4799fb7cc8d6bb1eae2d34a6cac214b25e78068f7",
+   "bytes": 686397,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_017",
+   "path": "data/box_017.json",
+   "js": "data/box_017.js",
+   "sha256": "ebdf574b2bed0ae5be594db4c939745d04bddbd2bf8683a7eb148317b842d025",
+   "bytes": 811336,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_018",
+   "path": "data/box_018.json",
+   "js": "data/box_018.js",
+   "sha256": "3836fe042599ccb153ef08220c1b63f5384e42fe5769d8739ec75a0d3024b119",
+   "bytes": 861368,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_019",
+   "path": "data/box_019.json",
+   "js": "data/box_019.js",
+   "sha256": "725d6f4f0a30dd611a82aadd105edba0d96991947ecca209edb5adbc60d810c8",
+   "bytes": 943547,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_020",
+   "path": "data/box_020.json",
+   "js": "data/box_020.js",
+   "sha256": "880c011db81d95c71732617a6b1ce71731600869fe601eb82e76fe28169edd44",
+   "bytes": 940337,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_021",
+   "path": "data/box_021.json",
+   "js": "data/box_021.js",
+   "sha256": "05527f89ec88beba4689748869d622373f369ccdf637c0bc3145646b50afac34",
+   "bytes": 943583,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_022",
+   "path": "data/box_022.json",
+   "js": "data/box_022.js",
+   "sha256": "bbd272695c5eb9f03c14674b8379c6483dcf1ce2b9d7875c5a6338454e7b33ee",
+   "bytes": 943394,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_023",
+   "path": "data/box_023.json",
+   "js": "data/box_023.js",
+   "sha256": "a3cafa69940040a24659ee11168dd02c791263875f26002059eb17d2d51645b8",
+   "bytes": 152729,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_601",
+   "path": "data/box_601.json",
+   "js": "data/box_601.js",
+   "sha256": "43662ad41adf18097bc984ae4fd005799f7eee1a157c085177a481fb847b8083",
+   "bytes": 203444,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_602",
+   "path": "data/box_602.json",
+   "js": "data/box_602.js",
+   "sha256": "e3550791726f4c3f51bad895a4b2e81a14e826815bb1cf130b15ce4df7a7a4cc",
+   "bytes": 62155,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_803",
+   "path": "data/box_803.json",
+   "js": "data/box_803.js",
+   "sha256": "81e723a81acb0626416180e7ecf8363078f5f878e1610dfe3ccf6bb1bcb64bb5",
+   "bytes": 84898,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_804",
+   "path": "data/box_804.json",
+   "js": "data/box_804.js",
+   "sha256": "fded8d7c040b5cdf243ee805b974ac32e3bd65da9ecadec77a09db8df3a6ec11",
+   "bytes": 64178,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_805",
+   "path": "data/box_805.json",
+   "js": "data/box_805.js",
+   "sha256": "ac14133abf62004c8da1e9f82bbf464afcbd60269d78caa1d2feaeb20b491c83",
+   "bytes": 68786,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_806",
+   "path": "data/box_806.json",
+   "js": "data/box_806.js",
+   "sha256": "774a1e4703ff026a1b542a6c66f5262b21810f26458c89b486b62b7ef86ace3f",
+   "bytes": 93600,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_807",
+   "path": "data/box_807.json",
+   "js": "data/box_807.js",
+   "sha256": "2315d02995dbd87bcfa59ada388180d55ce9c1d374e933d19a9ff6b7f32648a1",
+   "bytes": 70213,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_808",
+   "path": "data/box_808.json",
+   "js": "data/box_808.js",
+   "sha256": "22d8c950e2e54982e8049b27fc3e3526304dbc1aaf7082de96ba219d3b2bf480",
+   "bytes": 68621,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_809",
+   "path": "data/box_809.json",
+   "js": "data/box_809.js",
+   "sha256": "839b41f14c6b3efe04b6415ed887b87126ede0b03b053d9a563457387fa817b9",
+   "bytes": 55221,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_810",
+   "path": "data/box_810.json",
+   "js": "data/box_810.js",
+   "sha256": "92b774950cf336fcd53b19fc64c1992b82890d89d35f428f16d806d6c79f69d0",
+   "bytes": 58400,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_811",
+   "path": "data/box_811.json",
+   "js": "data/box_811.js",
+   "sha256": "9efae2bd9b582af24efb9ff81339e54dd042ea6f47e31169ebdf32b7c65f3cff",
+   "bytes": 69573,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_812",
+   "path": "data/box_812.json",
+   "js": "data/box_812.js",
+   "sha256": "3e75b34550ccdef122b9d79db9e7a06a0eae8bfbe20d8273b018b267207911f8",
+   "bytes": 79994,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_813",
+   "path": "data/box_813.json",
+   "js": "data/box_813.js",
+   "sha256": "738cc05cd505bb9b141e3c3f98d920a4fc34c63dc2d4b66210f3daac28b69305",
+   "bytes": 82057,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_814",
+   "path": "data/box_814.json",
+   "js": "data/box_814.js",
+   "sha256": "9dc13ab34622f9f4664d6d33b4b2d242369100f7ed99879f1a645bcd92550e43",
+   "bytes": 72249,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_815",
+   "path": "data/box_815.json",
+   "js": "data/box_815.js",
+   "sha256": "667480024d3ec7144b22ad51dda30c19a73b8d84fc8c0cb5b5581c5ed0bcce05",
+   "bytes": 47044,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_816",
+   "path": "data/box_816.json",
+   "js": "data/box_816.js",
+   "sha256": "bd81c96ebc56dbf5d831a288d93887e221e27acb1616e0859a874993d5abb376",
+   "bytes": 52120,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_817",
+   "path": "data/box_817.json",
+   "js": "data/box_817.js",
+   "sha256": "c420a2928b85e2e47784c06aba350da139fb7e8658285a8c9d1f3e10a94b0885",
+   "bytes": 101769,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_818",
+   "path": "data/box_818.json",
+   "js": "data/box_818.js",
+   "sha256": "d43d8df9cf7da3f2da92aa98e2125036fc89b182a7474c0cddc1384d3d2c31f2",
+   "bytes": 92530,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_819",
+   "path": "data/box_819.json",
+   "js": "data/box_819.js",
+   "sha256": "f85e53aaa10a476698557ea57b864d7c65e588855680dc2f53aa47e04994c709",
+   "bytes": 91258,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_820",
+   "path": "data/box_820.json",
+   "js": "data/box_820.js",
+   "sha256": "a79e382bc1acdc1db1b9538128fd3e1d84c85bd9e61180a918c8d5e243123a03",
+   "bytes": 86498,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_821",
+   "path": "data/box_821.json",
+   "js": "data/box_821.js",
+   "sha256": "c85084799d050a04ccf43d1f1f01965578b9c87673c291d5e1f257220937d88e",
+   "bytes": 102143,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_822",
+   "path": "data/box_822.json",
+   "js": "data/box_822.js",
+   "sha256": "78845bace8345f1498c4d607db7a84f500777296e883ac6351169ebea0458747",
+   "bytes": 108528,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_823",
+   "path": "data/box_823.json",
+   "js": "data/box_823.js",
+   "sha256": "5f4521d082c6931a12ebd932be8ddbaa8e9ef05df0d3ecb285d4e21b05546b6c",
+   "bytes": 75151,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
+   ]
+  },
+  {
+   "id": "box_824",
+   "path": "data/box_824.json",
+   "js": "data/box_824.js",
+   "sha256": "15ab5c3512f6079ae8c260d1eeda2fb9b508a5dfc99ff64085ca05e8bbfe79d9",
+   "bytes": 85780,
+   "lazy": 1,
+   "updated_at": "2026-11-25T19:38:51+09:00",
+   "globals": [
+    "KOVO_BOX"
    ]
   }
  ]
