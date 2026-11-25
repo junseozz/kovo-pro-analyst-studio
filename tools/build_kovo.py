@@ -335,7 +335,8 @@ def main():
 
     man = {"schema_version": 2, "app_version": "v1.0.0",
            "updated_at": GEN, "checked_at": GEN,
-           "data_through": max([g["d"] for s in data["sch"].values() for g in s["M"] if g.get("d")] or [""]),
+           "data_through": max([g["d"] for s in data["sch"].values() for g in s["M"] + s["W"]
+                                if g.get("d") and (g.get("hs") or 0) + (g.get("as") or 0) > 0] or [""]),
            "note": "KOVO 분석 스튜디오 앱이 맨 먼저 이 파일을 읽고 sha256 이 바뀐 청크만 내려받습니다. <id>.json(정본)과 window.KOVO_RECEIVE(...) 로 감싼 <id>.js 가 같은 내용입니다.",
            "chunks": []}
     for cid, body in chunks(data):
