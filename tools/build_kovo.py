@@ -620,7 +620,49 @@ def chunks(data):
     return [("core", core), ("games", games), ("season", season), ("news", news), ("live_patch", live)]
 
 
+def write_html(data):
+    css = open(os.path.join(TPL, "app.css"), encoding="utf-8").read()
+    jdir = os.path.join(TPL, "js")
+    parts = sorted([f for f in os.listdir(jdir) if f.endswith(".js")]) if os.path.isdir(jdir) else []
+    if parts:
+        js = "(function(){\n'use strict';\n" + "\n".join(open(os.path.join(jdir, f), encoding="utf-8").read() for f in parts) + "\n})();\n"
+    else:
+        js = open(os.path.join(TPL, "app.js"), encoding="utf-8").read()
+    html_tpl = open(os.path.join(TPL, "app.html"), encoding="utf-8").read()
+    payload = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    out = html_tpl.replace("/*__CSS__*/", css).replace("/*__JS__*/", js).replace("/*__DATA__*/", payload)
+    open(OUT_HTML, "w", encoding="utf-8").write(out)
+    print("HTML", OUT_HTML, os.path.getsize(OUT_HTML), hashlib.sha256(open(OUT_HTML, 'rb').read()).hexdigest())
+    print("MD5", hashlib.md5(open(OUT_HTML, "rb").read()).hexdigest())
+
+
+def build_from_chunks():
+    """원본 raw(236MB) 없이 이미 검증된 청크(core/games/season/news)로 앱만 재빌드.
+    데이터 내용은 바꾸지 않고, 템플릿(CSS/JS)만 새로 합쳐 단일 HTML을 만든다."""
+    data = {}
+    for cid in ("core", "games", "season", "news"):
+        part = load(os.path.join(REPO, "data", cid + ".json"))
+        if not part:
+            raise SystemExit("missing chunk: " + cid)
+        data.update(part)
+    data["v"] = "2.1.0"
+    data["gen"] = GEN
+    data.setdefault("meta", {})["generated"] = GEN
+    data["meta"]["app_version"] = data["v"]
+    man = load(os.path.join(REPO, "data", "manifest.json"), {"chunks": []})
+    data["hashes"] = {c["id"]: c["sha256"] for c in man.get("chunks", []) if not c.get("lazy")}
+    with open(os.path.join(REPO, "data", "manifest.json"), "w", encoding="utf-8") as f:
+        man["app_version"] = data["v"]
+        man["checked_at"] = GEN
+        json.dump(man, f, ensure_ascii=False, indent=1)
+    write_html(data)
+    print("chunks kept: no data rewrite (hash set:", len(data["hashes"]), ")")
+
+
 def main():
+    if "--from-chunks" in sys.argv:
+        build_from_chunks()
+        return
     data, boxchunks = build()
     CH = chunks(data)
     # 앱이 바뀐 청크만 내려받도록 청크 해시를 함께 심는다

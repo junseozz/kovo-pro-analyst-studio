@@ -79,3 +79,13 @@ GitHub 청크 동기화는 10분마다 별도로 수행하며, 바뀐 청크만 
 
 코칭스태프는 KOVO 공식 API가 제공하지 않아 **미공시**로 표기하며 추정해 넣지 않습니다.
 구단 주소·연락처·홈페이지·소개는 KOVO `/teams` 공식 값입니다.
+
+## 5. 앱 v2.1 실시간 연동 (2026-11-25)
+
+- 진행 중 경기는 `GET /stat/real-time?season=<시즌>&round=0&gnum=<경기번호>&gcode=001&hcode=<홈>&acode=<원정>&page=0&size=1`
+  응답을 12초 주기로 읽어 **세트 승수(SetPoint)·세트별/진행 세트 점수(S1~S5Point, setIng)·선수 누적 박스스코어(player)·팀 합계(team)** 를 표시합니다.
+  일정 API(`/stat/game-schedule`)는 진행 중 경기에서 `hspoint/aspoint`가 세트 승수와 일치하지 않는 경우가 있어(실측 확인),
+  진행 중 표시에는 `real-time`의 `homeSetPoint/awaySetPoint`를 사용합니다.
+- 종료 경기는 `GET /stat/game-schedule/<gnum>`의 `game`·`team`·`player` 원문 필드를 그대로 매핑합니다(공격 6개 루트, 블로킹 성공/유효/실패/범실, 서브 성공/시도/실패, 디그, 세트, 리시브, 총 범실).
+- 앱은 12초(실시간)·60초(일정·순위·동기화) 주기로 자동 갱신하며, 호출 실패 시에도 다음 주기에 재시도합니다.
+- `tools/build_kovo.py --from-chunks` : 원본 `kovo_raw.json`(236MB) 없이 검증된 청크(`core/games/season/news`)로 단일 HTML만 재빌드합니다.
