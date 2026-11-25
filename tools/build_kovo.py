@@ -4,6 +4,7 @@
 kovo_raw.json → 앱용 압축 데이터(KOVO_DATA) + GitHub 청크 + 단일 HTML 빌드.
 """
 import json, os, re, hashlib, datetime, sys
+from email.utils import parsedate_to_datetime
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = HERE
@@ -159,10 +160,10 @@ def build():
             fut[sc][key] = {
                 "leagues": {lc: blk["name"] for lc, blk in d["leagues"].items()},
                 "games": games,
-                "teams": [[n(r.get("rank")), r["tcode"], r.get("tsname"), n(r.get("g_count")), n(r.get("s_count")),
+                "teams": [[n(r.get("rank")), r["tcode"], (teams.get(r["tcode"], {}) or {}).get("n") or r.get("tsname") or "", n(r.get("g_count")), n(r.get("s_count")),
                            n(r.get("point")), n(r.get("att")), n(r.get("ats")), n(r.get("atsp")), n(r.get("bs")),
                            n(r.get("ss")), n(r.get("ds")), n(r.get("sets")), n(r.get("rs"))] for r in tr200],
-                "players": [[r.get("pcode"), r.get("pname"), r["tcode"], r.get("tsname"), n(r.get("bnum")),
+                "players": [[r.get("pcode"), r.get("pname"), r["tcode"], (teams.get(r["tcode"], {}) or {}).get("n") or r.get("tsname") or "", n(r.get("bnum")),
                              n(r.get("g_count")), n(r.get("s_count")), n(r.get("point")),
                              n(r.get("att")), n(r.get("ats")), n(r.get("atf")), n(r.get("ate")), n(r.get("atsp")),
                              n(r.get("st")), n(r.get("ss")), n(r.get("sf")), n(r.get("bt")), n(r.get("bs")),
@@ -196,7 +197,7 @@ def build():
                             "teams": [[n(r.get("rank")), r["tcode"], r.get("tsname"), n(r.get("g_count")), n(r.get("s_count")),
                                        n(r.get("point")), n(r.get("att")), n(r.get("ats")), n(r.get("atsp")),
                                        n(r.get("bs")), n(r.get("ss")), n(r.get("ds")), n(r.get("sets")), n(r.get("rs"))] for r in tr],
-                            "players": [[r.get("pcode"), r.get("pname"), r["tcode"], r.get("tsname"), n(r.get("bnum")),
+                            "players": [[r.get("pcode"), r.get("pname"), r["tcode"], (teams.get(r["tcode"], {}) or {}).get("n") or r.get("tsname") or "", n(r.get("bnum")),
                                          n(r.get("g_count")), n(r.get("s_count")), n(r.get("point")), n(r.get("att")),
                                          n(r.get("ats")), n(r.get("atf")), n(r.get("ate")), n(r.get("atsp")),
                                          n(r.get("st")), n(r.get("ss")), n(r.get("sf")), n(r.get("bt")), n(r.get("bs")),
@@ -260,6 +261,19 @@ def build():
                         "x": clean_text(body)[:1500], "img": images[:1], "ty": kind})
         news[kind] = out
 
+    packed_ext = []
+    for it in ((ext or {}).get("items") or []):
+        d = it.get("d") or ""
+        try:
+            d = parsedate_to_datetime(d).astimezone().strftime("%Y-%m-%d %H:%M")
+        except Exception:
+            d = d[:16]
+        t = it.get("t") or ""
+        src = it.get("s") or ""
+        if src and t.endswith(" - " + src):
+            t = t[: -len(src) - 3]
+        packed_ext.append({"t": t, "u": it.get("u") or "", "d": d, "s": src, "f": it.get("f") or ""})
+
     data = {
         "v": "1.0.0",
         "gen": GEN,
@@ -269,7 +283,7 @@ def build():
         "box": box, "bx": BX,
         "cup": cup, "fut": fut, "fbox": fbox,
         "players": players, "aw": aw,
-        "news": news, "ext": (ext or {}).get("items", []),
+        "news": news, "ext": packed_ext,
         "live": raw.get("live"),
         "meta": {
             "generated": GEN,
