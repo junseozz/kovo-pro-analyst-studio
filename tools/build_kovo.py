@@ -96,6 +96,8 @@ def classify_history(hist):
         typ = "등록"
         if "드래프트" in h:
             typ = "드래프트"
+        elif "병역의무완료" in h:
+            typ = "병역완료"
         elif any(k in h for k in K_RETIRE):
             typ = "은퇴"
         elif any(k in h for k in K_RELEASE):
@@ -176,7 +178,7 @@ def build():
         elif not teams[code].get("e"):
             teams[code]["e"] = t.get("emblem") or ""
     # 퓨처스·컵대회 출전팀(실업팀 포함) 보강 — 경기 일정의 공식 팀명/엠블럼 사용
-    for src in (raw.get("futures") or {}, raw.get("cup") or {}):
+    for src in (raw.get("futures") or {}, raw.get("cup") or {}, raw.get("special") or {}):
         for sc, sd in (src or {}).items():
             for g in ("1", "2"):
                 d = (sd or {}).get(g) or {}
@@ -309,6 +311,37 @@ def build():
                             "players": [[r.get("pcode"), r.get("pname"), r.get("tcode"), (teams.get(r.get("tcode"), {}) or {}).get("n") or r.get("tsname"),
                                          n(r.get("bnum"))] + [n(r.get(f)) for f in PR_FIELDS[5:]] for r in dedupe(prr)]}
 
+    # 국제·특별전 (한일 Top Match·최강전·라이벌매치·한중일·올스타·슈퍼매치)
+    intl = {}
+    spm = raw.get("specialMeta") or {}
+    for key, sdata in (raw.get("special") or {}).items():
+        meta = spm.get(key) or {}
+        intl[key] = {"n": meta.get("name") or key, "y": meta.get("year"), "gc": meta.get("gcode"), "M": {}, "W": {}}
+        for g, gk in (("1", "M"), ("2", "W")):
+            d = (sdata or {}).get(g) or {}
+            games = []
+            for lc, blk in (d.get("leagues") or {}).items():
+                for x in blk.get("games") or []:
+                    games.append(pack_game(x, lc))
+            games.sort(key=lambda x: (x["d"] or "", x["n"] or 0))
+            tr = []
+            for lc, arr in (d.get("teamRecords") or {}).items():
+                if arr:
+                    tr = arr; break
+            prr = []
+            for lc, arr in (d.get("playerRecords") or {}).items():
+                if arr:
+                    prr = arr; break
+            intl[key][gk] = {
+                "leagues": {lc: blk.get("name") for lc, blk in (d.get("leagues") or {}).items()},
+                "games": games,
+                "teams": [[n(r.get("rank")), r.get("tcode"), (teams.get(r.get("tcode"), {}) or {}).get("n") or r.get("tsname"),
+                           n(r.get("g_count")), n(r.get("s_count")), n(r.get("point")), n(r.get("att")), n(r.get("ats")),
+                           n(r.get("atsp")), n(r.get("bs")), n(r.get("ss")), n(r.get("ds")), n(r.get("sets")), n(r.get("rs"))] for r in tr],
+                "players": [[r.get("pcode"), r.get("pname"), r.get("tcode"), (teams.get(r.get("tcode"), {}) or {}).get("n") or r.get("tsname"),
+                             n(r.get("bnum"))] + [n(r.get(f)) for f in PR_FIELDS[5:]] for r in dedupe(prr)],
+            }
+
     # 선수
     latest = seasons[0]["c"] if seasons else ""
     roster_latest = set()
@@ -345,13 +378,13 @@ def build():
             status = "retired"
         elif last and last["t"] == "방출":
             status = "released"
-        elif ("군복무" in types) and (not last or last["t"] != "제대") and not any(k in (last["x"] if last else "") for k in ("전역", "복귀", "제대")):
+        elif last and last["t"] == "군복무":
             status = "army"
         elif pc not in roster_latest and "은퇴" not in types:
             status = "former"
         if pc in roster_latest:
             status = "active"
-            if any(k in (last["x"] if last else "") for k in ("상무", "국군체육부대")):
+            if last and last["t"] == "군복무":
                 status = "army"
         honors = (p.get("honor") or {})
         sc_parsed = parse_school(d.get("school"))
@@ -376,6 +409,35 @@ def build():
                          n(x.get("serveSetSuccess")), n(x.get("setSuccess")), n(x.get("receiveSuccess")),
                          n(x.get("digSetSuccess")), n(x.get("error"))] for x in sr],
         })
+    # 상세가 없거나 이름이 빈 선수는 공식 경기 기록의 이름/팀으로 보강
+    nm = {}
+    for sc in sorted((raw.get("v") or {}).keys(), reverse=True):
+        for g in ("1", "2"):
+            for r in ((raw["v"][sc].get(g) or {}).get("playerRecords") or []):
+                pc = str(r.get("pcode") or "")
+                if pc and pc not in nm and r.get("pname"):
+                    nm[pc] = (r.get("pname"), r.get("tcode"), r.get("tsname"), r.get("bnum"))
+    # 로스터(모든 대회)에서도 이름 보강
+    def add_roster_names(rosters, gender):
+        for tc, arr in (rosters or {}).items():
+            for p in arr or []:
+                pc = str(p.get("playerCode") or "")
+                if pc and pc not in nm and p.get("name"):
+                    nm[pc] = (p.get("name"), tc, (teams.get(tc, {}) or {}).get("n") or p.get("teamName"), p.get("backNumber"))
+    for sc, gd in (raw.get("v") or {}).items():
+        for g in ("1", "2"):
+            add_roster_names(((gd.get(g) or {}).get("rosters")), g)
+    for src in (raw.get("cup") or {}, raw.get("futures") or {}, raw.get("special") or {}):
+        for key, sd in src.items():
+            for g in ("1", "2"):
+                d = (sd or {}).get(g) or {}
+                add_roster_names(d.get("rosters"), g)
+    for p in players:
+        if not p.get("n") and p["p"] in nm:
+            x = nm[p["p"]]
+            p["n"], p["t"], p["tn"], p["no"] = x[0], x[1], x[2], n(x[3])
+    # 이름조차 공식 데이터에 없는 항목은 표시할 수 없으므로 제외
+    players = [p for p in players if p.get("n")]
     # 상세 없는 선수는 최신 기록으로 이름/팀/포지션 보강
     bycode = {p["p"]: p for p in players}
     for sc in sorted((raw.get("v") or {}).keys(), reverse=True):
@@ -509,7 +571,7 @@ def build():
         "teams": teams,
         "std": std, "tstat": tstat, "pr": pr, "rk": rk, "sch": sch, "aw": aw,
         "box": box, "boxSeasons": sorted(boxchunks.keys(), reverse=True),
-        "cup": cup, "fut": fut,
+        "cup": cup, "fut": fut, "intl": intl,
         "players": players, "roster": sorted(roster_latest), "rosterTeams": roster_by_team,
         "news": news, "ext": packed_ext, "live": live,
         "meta": {
@@ -549,7 +611,7 @@ def sha256_file(p):
 def chunks(data):
     core = {k: data[k] for k in ("v", "gen", "seasons", "recent3", "cupSeasons", "futSeasons", "teams", "std",
                                  "tstat", "pr", "rk", "aw", "meta", "roster", "rosterTeams")}
-    games = {k: data[k] for k in ("sch", "box", "boxSeasons", "cup", "fut")}
+    games = {k: data[k] for k in ("sch", "box", "boxSeasons", "cup", "fut", "intl")}
     season = {k: data[k] for k in ("players",)}
     news = {k: data[k] for k in ("news", "ext")}
     live = {"live": data.get("live"), "sch": {sc: data["sch"].get(sc) for sc in data["recent3"]}, "gen": data["gen"]}
@@ -558,8 +620,12 @@ def chunks(data):
 
 def main():
     data, boxchunks = build()
+    CH = chunks(data)
+    # 앱이 바뀐 청크만 내려받도록 청크 해시를 함께 심는다
+    data["hashes"] = {cid: hashlib.sha256(json.dumps(body, ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
+                      for cid, body in CH}
     print("chunk sizes:")
-    for cid, body in chunks(data):
+    for cid, body in CH:
         print("  ", cid, len(json.dumps(body, ensure_ascii=False, separators=(",", ":")).encode()))
     os.makedirs(os.path.join(REPO, "data"), exist_ok=True)
     os.makedirs(os.path.join(REPO, "tools"), exist_ok=True)
@@ -572,7 +638,7 @@ def main():
            "recent3": data["recent3"],
            "note": "앱이 맨 먼저 이 파일을 읽고 sha256 이 바뀐 청크만 내려받습니다. box_* 청크는 경기 박스스코어를 열 때만 내려받습니다.",
            "chunks": []}
-    for cid, body in chunks(data):
+    for cid, body in CH:
         jp = os.path.join(REPO, "data", cid + ".json")
         js = json.dumps(body, ensure_ascii=False, separators=(",", ":"))
         open(jp, "w", encoding="utf-8").write(js)

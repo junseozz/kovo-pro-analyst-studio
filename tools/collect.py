@@ -183,6 +183,25 @@ def collect_fut(sc, g, leagues):
     return name, cached(name, work)
 
 
+def collect_special(gc, sc, g, leagues):
+    name = "sp_%s_%s_%s" % (gc, sc, g)
+
+    def work():
+        d = {"leagues": {}, "teamRecords": {}, "playerRecords": {}}
+        for lg in leagues:
+            lc = lg["leagueCode"]
+            sh = api("/stat/game-schedule", {"gcode": gc, "seasonCode": sc, "leagueCode": lc, "gender": g, "size": 200}, quiet=True) or {}
+            d["leagues"][lc] = {"name": lg.get("leagueName"), "games": sh.get("content", []) if isinstance(sh, dict) else []}
+        for lc in {"200", "211", "902", "791", "793", "904"} | {x["leagueCode"] for x in leagues}:
+            tr = api("/stat/team-records", {"gcode": gc, "seasonCode": sc, "leagueCode": lc, "gender": g}, quiet=True) or {}
+            d["teamRecords"][lc] = tr.get("content", []) if isinstance(tr, dict) else []
+            pr = api("/stat/player-records", {"gcode": gc, "seasonCode": sc, "leagueCode": lc, "gender": g, "page": 0, "size": 300}, quiet=True) or {}
+            d["playerRecords"][lc] = pr.get("content", []) if isinstance(pr, dict) else []
+        return d
+
+    return name, cached(name, work)
+
+
 def collect_players(pcodes, workers=8):
     todo = [p for p in pcodes if not os.path.exists(cpath("p_" + p))]
     print("  선수 상세 대상", len(pcodes), "신규", len(todo))
@@ -287,11 +306,26 @@ def main():
             for name, d in ex.map(lambda a: collect_fut(*a), jobs):
                 print("  ", name, round(time.time() - T0, 1), "s")
 
+    if cmd in ("special", "all"):
+        print("[special]")
+        SPEC = {}
+        for gc in ("003", "004", "005", "006", "007", "008"):
+            SPEC[gc] = api("/stat/season-list", {"gcode": gc}) or []
+        json.dump(SPEC, open(cpath("specialSeasons"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+        jobs = []
+        for gc, sl in SPEC.items():
+            for s in sl:
+                for g in ("1", "2"):
+                    jobs.append((gc, s["seasonCode"], g, s.get("leagues") or []))
+        with ThreadPoolExecutor(max_workers=4) as ex:
+            for name, d in ex.map(lambda a: collect_special(*a), jobs):
+                print("  ", name, round(time.time() - T0, 1), "s")
+
     if cmd in ("players", "all"):
         print("[players]")
         pcs = set()
         for fn in sorted(os.listdir(CACHE)):
-            if not fn.startswith(("v_", "cup_", "fut_")):
+            if not fn.startswith(("v_", "cup_", "fut_", "sp_")):
                 continue
             d = json.load(open(os.path.join(CACHE, fn), encoding="utf-8"))
             if isinstance(d.get("playerRecords"), list):
@@ -320,15 +354,16 @@ def main():
         print("[boxes]")
         units = []
         for fn in sorted(os.listdir(CACHE)):
-            if not fn.endswith(".json") or not fn.startswith(("v_", "cup_", "fut_")):
+            if not fn.endswith(".json") or not fn.startswith(("v_", "cup_", "fut_", "sp_")):
                 continue
             base = fn[:-5]
-            src = base.split("_")[0]
-            if only and base.split("_")[1] not in only:
+            parts = base.split("_")
+            src = parts[0]
+            if only and len(parts) > 1 and parts[1] not in only:
                 continue
             d = json.load(open(os.path.join(CACHE, fn), encoding="utf-8"))
             games = []
-            gcode = {"v": "001", "cup": "002", "fut": "009"}[src]
+            gcode = ({"v": "001", "cup": "002", "fut": "009"}.get(src) or (parts[1] if src == "sp" else "001"))
             if src == "v":
                 rows = list(d.get("schedule") or [])
                 for lc, arr in (d.get("playoffs") or {}).items():
@@ -409,6 +444,23 @@ def merge():
         out["cup_meta_all"] = cup_meta
         for k, m in cup_meta.items():
             out["cup_meta_" + k] = m
+    sp = {}
+    sp_meta = {}
+    try:
+        sl_sp = loadc("specialSeasons") or {}
+        for gc, sl in sl_sp.items():
+            for s in sl:
+                key = gc + s["seasonCode"]
+                sp_meta[key] = {"name": s.get("seasonName"), "year": s.get("ryear"), "gcode": gc}
+                for g in ("1", "2"):
+                    d = loadc("sp_%s_%s_%s" % (gc, s["seasonCode"], g))
+                    if d:
+                        sp.setdefault(key, {})[g] = d
+        if sp:
+            out["special"] = sp
+            out["specialMeta"] = sp_meta
+    except Exception as e:
+        print("special merge skip", e)
     fut = {}
     fut_meta = {}
     for fs in sl_fut:
