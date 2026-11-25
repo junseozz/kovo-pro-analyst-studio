@@ -1,8 +1,8 @@
 {
  "schema_version": 3,
- "app_version": "2.1.0",
- "updated_at": "2026-11-25T19:56:57+09:00",
- "checked_at": "2026-11-25T21:13:21+09:00",
+ "app_version": "2.2.0",
+ "updated_at": "2026-11-26T07:00:46+09:00",
+ "checked_at": "2026-11-26T07:01:37+09:00",
  "data_through": "2026-11-24",
  "latest_season": "023",
  "recent3": [
@@ -16,9 +16,9 @@
    "id": "core",
    "path": "data/core.json",
    "js": "data/core.js",
-   "sha256": "54959858590216ce8cf9a4776efef0a1262cd611c5bf807a40dcca5c357727b1",
-   "bytes": 2521971,
-   "updated_at": "2026-11-25T19:56:57+09:00",
+   "sha256": "87663e5e89dcd28d7c765253495a6cd92059ea2bf56fb932217e476ed18af67f",
+   "bytes": 2346034,
+   "updated_at": "2026-11-26T07:00:46+09:00",
    "globals": [
     "KOVO_DATA"
    ]
@@ -38,9 +38,9 @@
    "id": "season",
    "path": "data/season.json",
    "js": "data/season.js",
-   "sha256": "eef5d9f8a17d4e61da248ee43c1dcb233886d963cdb723e54552fd833227b34a",
-   "bytes": 2377845,
-   "updated_at": "2026-11-25T19:56:57+09:00",
+   "sha256": "b76b930f14d0c0f5e8a899e8e4419926244e7e8326a7963884781294616e177d",
+   "bytes": 2140657,
+   "updated_at": "2026-11-26T07:00:46+09:00",
    "globals": [
     "KOVO_DATA"
    ]
@@ -811,5 +811,7 @@
     "KOVO_BOX"
    ]
   }
- ]
+ ],
+ "player_count": 1190,
+ "roster_count": 288
 }

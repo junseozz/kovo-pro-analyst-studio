@@ -586,6 +586,7 @@ def build():
             "blocked": (ext or {}).get("blocked", []),
         },
     }
+    sync_current_roster(data)
     return data, boxchunks
 
 
@@ -602,6 +603,72 @@ def pack_game(x, lc):
             "hc": x.get("hsname") or x.get("hn") or "", "ac": x.get("asname") or x.get("an") or ""}
 
 
+def year_of_record(sd):
+    """'2026-2027 [정]' → '2026-2027'"""
+    m = re.search(r"(\d{4}-\d{4})", str(sd or ""))
+    return m.group(1) if m else ""
+
+
+STAFF_BNUM = 100  # KOVO 선수 등번호는 1~99 — 100 이상은 감독·코칭스태프 행
+
+
+def sync_current_roster(data):
+    """현재 구단 등록(REGISTER) 로스터를 단일 기준으로 정비한다.
+
+    KOVO /stat/player-records 에는 감독·코치가 '선수' 행으로 섞여 내려온다
+    (등번호 100 이상, 개인 기록 전부 0, 경기·세트만 팀 합계). 그대로 두면
+    팀을 떠난 인물이 현재 스쿼드·검색·선수 목록·라인업에 뜨고,
+    반대로 개인 기록이 아직 없는 등록 선수는 목록에서 빠진다.
+    ① 선수 기록에서 코칭스태프 행 제거 ② 코칭스태프 전용 인물은 선수 DB에서 제외
+    ③ 그 인물의 코칭스태프 시즌 행을 선수 이력에서 제거 ④ 등록 선수 소속을 로스터로 고정
+    """
+    roster = set(str(x) for x in (data.get("roster") or []))
+    years = {s["c"]: s.get("y") or "" for s in data.get("seasons") or []}
+    team_of = {}
+    for g, mp in (data.get("rosterTeams") or {}).items():
+        for tc, arr in (mp or {}).items():
+            for pc in arr:
+                team_of[str(pc)] = tc
+    staff_years, player_year = {}, set()
+    removed_rows = 0
+    for sc, blocks in (data.get("pr") or {}).items():
+        y = years.get(sc, "")
+        for key in ("M", "W"):
+            keep = []
+            for r in blocks.get(key) or []:
+                if isinstance(r[4], (int, float)) and r[4] >= STAFF_BNUM:
+                    staff_years.setdefault(str(r[0]), set()).add(y)
+                    removed_rows += 1
+                    continue
+                player_year.add((str(r[0]), y))
+                keep.append(r)
+            blocks[key] = keep
+    players, staff_only = [], []
+    for p in data.get("players") or []:
+        pc = str(p["p"])
+        if pc not in roster and not any((pc, y) in player_year for y in set(years.values())):
+            staff_only.append(pc)
+            continue
+        p["seasons"] = [r for r in (p.get("seasons") or [])
+                        if not (year_of_record(r[1]) in staff_years.get(pc, set())
+                                and (pc, year_of_record(r[1])) not in player_year)]
+        if pc in team_of:
+            p["t"] = team_of[pc]
+            tn = ((data.get("teams") or {}).get(team_of[pc]) or {}).get("n")
+            if tn:
+                p["tn"] = tn
+        players.append(p)
+    data["players"] = players
+    data["rosterSeason"] = (data.get("seasons") or [{}])[0].get("c") or ""
+    meta = data.setdefault("meta", {})
+    meta["player_count"] = len(players)
+    meta["roster_count"] = len(roster)
+    meta["roster_season"] = data["rosterSeason"]
+    meta["staff_rows_removed"] = removed_rows
+    meta["staff_players_removed"] = len(staff_only)
+    return {"staff_rows": removed_rows, "staff_only": len(staff_only), "players": len(players)}
+
+
 def sha256_file(p):
     h = hashlib.sha256()
     with open(p, "rb") as f:
@@ -612,7 +679,7 @@ def sha256_file(p):
 
 def chunks(data):
     core = {k: data[k] for k in ("v", "gen", "seasons", "recent3", "cupSeasons", "futSeasons", "teams", "std",
-                                 "tstat", "pr", "rk", "aw", "meta", "roster", "rosterTeams")}
+                                 "tstat", "pr", "rk", "aw", "meta", "roster", "rosterTeams", "rosterSeason")}
     games = {k: data[k] for k in ("sch", "box", "boxSeasons", "cup", "fut", "intl")}
     season = {k: data[k] for k in ("players",)}
     news = {k: data[k] for k in ("news", "ext")}
@@ -645,7 +712,7 @@ def build_from_chunks():
         if not part:
             raise SystemExit("missing chunk: " + cid)
         data.update(part)
-    data["v"] = "2.1.0"
+    data["v"] = "2.2.0"
     data["gen"] = GEN
     data.setdefault("meta", {})["generated"] = GEN
     data["meta"]["app_version"] = data["v"]
