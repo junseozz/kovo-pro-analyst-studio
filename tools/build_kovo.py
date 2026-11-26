@@ -15,6 +15,32 @@ KOVO_NEWS = os.path.join(ROOT, "data", "kovo_news_raw.json")
 OUT_HTML = "/workspace/KOVO_PRO_ANALYST_STUDIO.html"
 REPO = os.path.join(ROOT, "repo")
 TPL = os.path.join(ROOT, "templates")
+TEAMPROF = os.path.join(ROOT, "data", "team_profiles.json")
+
+
+def apply_team_profiles(teams):
+    """2026-27 공식 검증 구단 소개(연고지·홈구장·사무국) 를 teams 메타에 병합.
+    KOVO API description 이 연고지 이전 전 문구를 그대로 담고 있는 구단(예: OK저축은행의 안산)은
+    검증된 소개 문구로 교체한다."""
+    prof = load(TEAMPROF, {}) or {}
+    table = prof.get("teams") or {}
+    n = 0
+    for code, p in table.items():
+        t = teams.get(code)
+        if t is None:
+            continue
+        t["reg"] = p.get("reg") or ""
+        t["regNote"] = p.get("regNote") or ""
+        t["arena"] = p.get("arena") or ""
+        t["aaddr"] = p.get("aaddr") or ""
+        t["cap"] = p.get("cap") or ""
+        if p.get("addr"):
+            t["addr"] = p["addr"]
+        if p.get("intro"):
+            t["intro"] = p["intro"]
+            t["introSrc"] = prof.get("season") or ""
+        n += 1
+    return n
 
 
 def load(p, default=None):
@@ -454,6 +480,9 @@ def build():
                               "st": "active" if pc in roster_latest else "former", "ev": [], "teams": [], "debut": "", "hist": [],
                               "hon": [], "hon2": [], "hon3": [], "seasons": []}
                 players.append(bycode[pc])
+    # 군입대 판정 정리 — 오래된 상무 이력만 남은 인물은 군입대가 아니다
+    normalize_army_status(players, (seasons[0].get("n") if seasons else ""))
+
     # 이름 중복 표시용 (동명이인)
     cnt = {}
     for p in players:
@@ -568,7 +597,7 @@ def build():
             "latest_season": latest}
 
     data = {
-        "v": "2.0.0", "gen": GEN,
+        "v": "2.4.1", "gen": GEN,
         "seasons": seasons, "recent3": recent3, "cupSeasons": cupSeasons, "futSeasons": futSeasons,
         "teams": teams,
         "std": std, "tstat": tstat, "pr": pr, "rk": rk, "sch": sch, "aw": aw,
@@ -587,6 +616,7 @@ def build():
         },
     }
     sync_current_roster(data)
+    print("team profiles merged:", apply_team_profiles(data["teams"]))
     return data, boxchunks
 
 
@@ -610,6 +640,34 @@ def year_of_record(sd):
 
 
 STAFF_BNUM = 100  # KOVO 선수 등번호는 1~99 — 100 이상은 감독·코칭스태프 행
+
+
+def normalize_army_status(players, latest_name):
+    """군입대(현재 복무) 판정 정리.
+
+    KOVO 공식 이력의 마지막 항목이 '군복무'여도 2005~2015년 상무 이력만 남은 인물은
+    현재 복무가 아니라 이미 팀을 떠난 과거 선수다. 입대 시즌이 최근 3시즌 이내일 때만
+    'army'(군입대)로 두고, 그보다 오래된 경우는 'former'(과거 소속)로 내린다.
+    선수 분석은 현역 등록 + 군입대 두 항목만 표시하므로, 은퇴·방출 선수가
+    군입대로 섮여 노출되지 않도록 데이터 단계에서 먼저 바로잡는다.
+    """
+    m = re.search(r"(20\d{2})\s*[~-]\s*(20\d{2})", str(latest_name or "")) or re.search(r"(20\d{2})", str(latest_name or ""))
+    base = int(m.group(1)) if m else 0
+    if not base:
+        return 0
+    changed = 0
+    for p in players:
+        if p.get("st") != "army":
+            continue
+        ev = p.get("ev") or []
+        last = ev[-1] if ev else None
+        text = str(last[1]) if last else ""
+        mm = re.match(r"\s*(\d{4})", text)
+        year = int(mm.group(1)) if mm else 0
+        if not year or year < base - 2:
+            p["st"] = "former"
+            changed += 1
+    return changed
 
 
 def sync_current_roster(data):
@@ -712,8 +770,9 @@ def build_from_chunks():
         if not part:
             raise SystemExit("missing chunk: " + cid)
         data.update(part)
-    data["v"] = "2.2.0"
+    data["v"] = "2.4.1"
     data["gen"] = GEN
+    print("team profiles merged:", apply_team_profiles(data.get("teams") or {}))
     data.setdefault("meta", {})["generated"] = GEN
     data["meta"]["app_version"] = data["v"]
     man = load(os.path.join(REPO, "data", "manifest.json"), {"chunks": []})
